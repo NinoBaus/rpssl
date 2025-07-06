@@ -1,0 +1,81 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: app
+    container_name: app
+    ports:
+      - "8000:8000"
+    networks:
+      - rpssl
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: react_app
+    ports:
+      - "3001:80"
+    depends_on:
+      - app
+    networks:
+      - rpssl
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: worker
+    container_name: celery_worker
+    depends_on:
+      - redis
+    networks:
+      - rpssl
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: beat
+    container_name: celery_beat
+    depends_on:
+      - redis
+    networks:
+      - rpssl
+
+  lint:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    command: flake8 .
+    depends_on:
+      - app
+
+  redis:
+    image: redis:latest
+    command: redis-server
+    ports:
+      - 6379:6379
+    networks:
+      - rpssl
+
+  redis-commander:
+    container_name: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - 9001:8081
+    networks:
+      - rpssl
+
+networks:
+  rpssl:
+    driver: bridge
+    name: rpssl
