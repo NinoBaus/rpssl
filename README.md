@@ -62,11 +62,10 @@ Redis Commander	http://localhost:9001
 
 Since we are limited by provided endpoint https://codechallenge.boohma.com/random for randomizing computer choice, 
 straight forward solution for calling endpoint every time when user plays isn't an option, and it's a limiting factor that
-is stopping our service for being scalable. Because of that, I implemented few things that should make our game playable.
+is stopping our service from being scalable. Because of that, I implemented few things that should make our game playable.
 1. Buffer : There is a celery task that is calling the endpoint every three seconds and saving random number to Redis
 2. In this version Redis will keep 500 results so that we would stop calling endpoint after the buffer memory is full.
-3. When the player pick the sign, frontend will show winning / losing / tie animations for one second. Within that one 
-4. second, player will not be albe to make another choice, which is giving us more time to fill the buffer.
+3. When the player pick the sign, frontend will show winning / losing / tie animations for one second. Within that one second, player will not be albe to make another choice, which is giving us more time to fill the buffer.
 
 If the buffer is empty, or if Redis isn't available, only then we will call the endpoint directly from our backend 
 microservice.
@@ -85,3 +84,10 @@ To make everything much more simple, I used emojis as a way to show the signs.
 - greeting: 🖐 - Used as placeholder for player and cpu when nothing was played
 - question mark: ❓ - Click on it to get random sign as a suggestion
 - restart: 🔄 - Used to restart the game and it's scores
+
+
+![img_2.png](img_2.png)
+
+![img.png](img.png)
+
+![img_1.png](img_1.png)
